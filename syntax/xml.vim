@@ -1,11 +1,12 @@
 " Vim syntax file
 " Language:	XML
-" Maintainer:	Johannes Zellner <johannes@zellner.org>
-"		Author and previous maintainer:
+" Maintainer:	Amadeus Demarzi http://github.com/amadeus
+"		Author and previous maintainers:
+"		Johannes Zellner <johannes@zellner.org>
 "		Paul Siegmann <pauls@euronet.nl>
-" Last Change:	2013 Jun 07
+" Last Change:	2017 May 17
+" License: MIT
 " Filenames:	*.xml
-" $Id: xml.vim,v 1.3 2006/04/11 21:32:00 vimboss Exp $
 
 " CONFIGURATION:
 "   syntax folding can be turned on by
@@ -122,7 +123,7 @@ endif
 "  ^^^
 "
 syn match   xmlTagName
-    \ +<\@1<=[^ /!?<>"']\++
+    \ +\%(<\|</\)\@2<=[^ /!?<>"']\++
     \ contained
     \ contains=xmlNamespace,xmlAttribPunct,@xmlTagHook
     \ display
@@ -157,11 +158,11 @@ if exists('g:xml_syntax_folding')
     " </tag>
     " ^^^^^^
     "
-    syn match   xmlEndTag
-	\ +</[^ /!?<>"']\+>+
+    syn region   xmlEndTag
+	\ matchgroup=xmlTag start=+</[^ /!?<>"']\@=+
+	\ matchgroup=xmlTag end=+>+
 	\ contained
-	\ contains=xmlNamespace,xmlAttribPunct,@xmlTagHook
-
+	\ contains=xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 
     " tag elements with syntax-folding.
     " NOTE: NO HIGHLIGHTING -- highlighting is done by contained elements
@@ -181,7 +182,7 @@ if exists('g:xml_syntax_folding')
 	\ start=+<\z([^ /!?<>"']\+\)+
 	\ skip=+<!--\_.\{-}-->+
 	\ end=+</\z1\_\s\{-}>+
-	\ matchgroup=xmlEndTag end=+/>+
+	\ end=+/>+
 	\ fold
 	\ contains=xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
 	\ keepend
@@ -198,9 +199,10 @@ else
 	\ matchgroup=xmlTag end=+>+
 	\ contains=xmlError,xmlTagName,xmlAttrib,xmlEqual,xmlString,@xmlStartTagHook
 
-    syn match   xmlEndTag
-	\ +</[^ /!?<>"']\+>+
-	\ contains=xmlNamespace,xmlAttribPunct,@xmlTagHook
+    syn region   xmlEndTag
+	\ matchgroup=xmlTag start=+</[^ /!?<>"']\@=+
+	\ matchgroup=xmlTag end=+>+
+	\ contains=xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 
 endif
 
@@ -286,7 +288,7 @@ endif
 
 syn keyword xmlDocTypeKeyword contained DOCTYPE PUBLIC SYSTEM
 syn region  xmlInlineDTD contained matchgroup=xmlDocTypeDecl start="\[" end="]" contains=@xmlDTD
-syn include @xmlDTD <sfile>:p:h/dtd.vim
+syn include @xmlDTD syntax/dtd.vim
 unlet b:current_syntax
 
 
